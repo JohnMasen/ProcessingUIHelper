@@ -4,19 +4,33 @@ public class GridLayout
   float[] columns;
   float[] rows;
   float width,height;
-  PVector world;
+  PVector topLeft;
   GridCell[][] cells;
-  public GridLayout(float w,float h,PVector worldTranslate)
-  {
-    this.width=w;
-    this.height=h;
-    world=worldTranslate;
+  GridLayout parent;
+  public GridLayout(GridLayout p, int row,int col, int rowSpan, int colSpan)
+  { 
+    topLeft=p.cells[row][col].topLeft;
+    PVector bottomRight=p.cells[row+rowSpan][col+colSpan].bottomRight;
+    this.width=bottomRight.x-topLeft.x;
+    this.height=bottomRight.y-topLeft.y;
   }
+  
+  
   public GridLayout(float w,float h)
   {
     this.width=w;
     this.height=h;
-    world=new PVector();
+    topLeft=new PVector();
+  }
+  
+  public PVector getTopLeft()
+  {
+    PVector result=topLeft.copy();
+    if (parent!=null)
+    {
+      result.add(parent.getTopLeft());
+    }
+    return result;
   }
   
   public void setColumns(String data)
@@ -39,7 +53,7 @@ public class GridLayout
       {
         for(int c=0;c<columns.length-1;c++)
         {
-          cells[r][c]=new GridCell(columns[c],rows[r],columns[c+1]-columns[c],rows[r+1]-rows[r],world);
+          cells[r][c]=new GridCell(columns[c],rows[r],columns[c+1]-columns[c],rows[r+1]-rows[r],topLeft);
         }
       }
     }
