@@ -7,7 +7,7 @@ void setup()
   g.setRows("1*,1*,1*");
   println(g.columns);
   println(g.rows);
-  testDrawGrids(g);
+  testDrawGrids(g);  
 }
 
 
