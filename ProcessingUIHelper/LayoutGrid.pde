@@ -7,6 +7,9 @@ public class GridLayout
   PVector topLeft;
   GridCell[][] cells;
   GridLayout parent;
+  boolean enableBackground;
+  color[] background;
+  
   public GridLayout(GridLayout p, int row,int col, int rowSpan, int colSpan)
   { 
     topLeft=p.cells[row][col].topLeft;
@@ -59,19 +62,31 @@ public class GridLayout
     }
   }
   
-  public void draw()
+  public void drawChessboard(color... colors)
   {
-    if(cells!=null)
+    if (colors.length==0)
     {
-      for (int r=0;r<rows.length-1;r++)
+      colors=new color[]{color(0),color(255)};
+    }
+
+    for (int row=0;row<rows.length-1;row++)
+    {
+      for(int col=0;col<columns.length-1;col++)
       {
-        for(int c=0;c<columns.length-1;c++)
-        {
-          cells[r][c].draw();
-        }
+        pushStyle();
+        pushMatrix();
+        color c=colors[(row+col)%colors.length];
+        fill(c);
+        GridCell cell=cells[row][col];
+        cell.translateTo();
+        rect(0,0,cell.width,cell.height);
+        popMatrix();
+        popStyle();
       }
     }
+    
   }
+
      
   private float[] parseGapDefinition(String data, float value)
   {
@@ -124,7 +139,7 @@ public class GridCell
   PVector topLeft;
   PVector bottomRight;
   PVector world;
-  PShape shapes;
+
   float width;
   float height;
   GridCell(float x, float y, float w, float h, PVector worldTranslate)
@@ -132,7 +147,7 @@ public class GridCell
     topLeft=new PVector(x,y);
     bottomRight=new PVector(x+w,y+h);
     world=worldTranslate;
-    shapes=createShape(GROUP);
+
     this.width=w;
     this.height=h;
   }
@@ -143,16 +158,11 @@ public class GridCell
     translate(topLeft.x,topLeft.y);
   }
   
-  public void addShape(PShape s)
-  {
-    shapes.addChild(s);
-  }
-  
   public void draw()
   {
     pushMatrix();
     translateTo();
-    shape(shapes);
+    //shape(shapes);
     popMatrix();
   }
 }
