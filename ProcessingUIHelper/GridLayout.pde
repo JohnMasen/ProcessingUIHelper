@@ -3,27 +3,38 @@ public class GridLayout
 {
   float[] columns;
   float[] rows;
-  float width,height;
+  float gridWidth,gridHeight;
   PVector topLeft;
   GridCell[][] cells;
   GridLayout parent;
   boolean enableBackground;
   color[] background;
+  int previousWidth,previousHeight;
   
   public GridLayout(GridLayout p, int row,int col, int rowSpan, int colSpan)
   { 
     topLeft=p.cells[row][col].topLeft;
     PVector bottomRight=p.cells[row+rowSpan][col+colSpan].bottomRight;
-    this.width=bottomRight.x-topLeft.x;
-    this.height=bottomRight.y-topLeft.y;
+    this.gridWidth=bottomRight.x-topLeft.x;
+    this.gridHeight=bottomRight.y-topLeft.y;
+    setDefaultGrid();
   }
   
   
   public GridLayout(float w,float h)
   {
-    this.width=w;
-    this.height=h;
+    this.gridWidth=w;
+    this.gridHeight=h;
     topLeft=new PVector();
+    setDefaultGrid();
+  }
+  
+  public GridLayout()
+  {
+    this.gridWidth=width;
+    this.gridHeight=height;
+    topLeft=new PVector();
+    setDefaultGrid();
   }
   
   public PVector getTopLeft()
@@ -36,15 +47,58 @@ public class GridLayout
     return result;
   }
   
+  private void setDefaultGrid()
+  {
+    setColumns("1*,1*,1*,1*,1*,1*,1*,1*,1*,1*,1*,1*");
+    setRows("1*,1*,1*,1*,1*,1*,1*,1*,1*,1*,1*,1*");
+  }
+  
+  public void boundToCells(int row,int col, int rowSpan,int colSpan)
+  {
+    previousWidth=width;
+    previousHeight=height;
+    PVector pos1=cells[row][col].topLeft;
+    PVector pos2=cells[row+rowSpan][col+colSpan].bottomRight;
+    println("pos1",pos1,"pos2",pos2);
+    println("width",pos2.x-pos1.x);
+    pushMatrix();
+    cells[row][col].translateTo();
+    width=int(pos2.x-pos1.x);
+    height=int(pos2.y-pos1.y);
+  }
+  public void projectToCells(int row,int col, int rowSpan,int colSpan,int w,int h)
+  {
+    previousWidth=width;
+    previousHeight=height;
+    PVector pos1=cells[row][col].topLeft;
+    PVector pos2=cells[row+rowSpan][col+colSpan].bottomRight;
+    println("pos1",pos1,"pos2",pos2);
+    println("width",pos2.x-pos1.x);
+    pushMatrix();
+    
+    cells[row][col].translateTo();
+    
+    width=int(pos2.x-pos1.x);
+    height=int(pos2.y-pos1.y);
+    scale(float(width)/w,float(height)/h);
+  }
+  
+  public void unbound()
+  {
+    width=previousWidth;
+    height=previousHeight;
+    popMatrix();
+  }
+  
   public void setColumns(String data)
   {
-    columns=parseGapDefinition(data,this.width);
+    columns=parseGapDefinition(data,this.gridWidth);
     refreshCells();
   }
   
   public void setRows(String data)
   {
-    rows=parseGapDefinition(data,this.height);
+    rows=parseGapDefinition(data,this.gridHeight);
     refreshCells();
   }
   private void refreshCells()

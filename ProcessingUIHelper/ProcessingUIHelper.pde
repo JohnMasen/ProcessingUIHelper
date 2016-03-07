@@ -1,4 +1,4 @@
-iTestScene s=new test2();
+iTestScene s=new test3();
 void setup()
 {
   size(500,500);
