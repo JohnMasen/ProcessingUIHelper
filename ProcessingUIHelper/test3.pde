@@ -13,14 +13,14 @@ public class test3 implements iTestScene
   void setup()
   {
     g=new GridLayout();//root grid
-    g.setColumns("10*,2*");
+    g.setColumns("1*,2*");
     g.setRows("1*");
     workspace=new GridLayout(g,0,1,0,0);
     workspace.setColumns("1*,1*");
     workspace.setRows("1*,1*");
-
+    workspace.project(640,360);
     w = width+16;
-    w=640+16;
+    
     dx = (TWO_PI / period) * xspacing;
     yvalues = new float[w/xspacing];
 
@@ -30,7 +30,7 @@ public class test3 implements iTestScene
   {
     background(51);
     g.drawChessboard();
-    workspace.drawChessboard(color(100),color(200));
+    workspace.drawChessboard(color(100),color(200)); //<>//
     workspace.project(640,360);
 
     calcWave();
