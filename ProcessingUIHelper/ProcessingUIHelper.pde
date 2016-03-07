@@ -1,4 +1,4 @@
-iTestScene s=new test4();
+iTestScene s=new gridTest1();
 void setup()
 {
   size(500,500);

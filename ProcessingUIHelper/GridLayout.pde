@@ -172,6 +172,15 @@ public class GridLayout
         GridCell cell=cells[row][col];
         cell.translateTo();
         rect(0,0,cell.width,cell.height);
+        //revert the color for text
+        int r = (c >> 16) & 0xFF;  // Faster way of getting red(argb)
+        int g = (c >> 8) & 0xFF;   // Faster way of getting green(argb)
+        int b = c & 0xFF;          // Faster way of getting blue(argb)
+        c=color(255-r,255-g,255-b);
+        fill(c);
+        println(c & 0x00ff0000);
+        textAlign(CENTER,CENTER);
+        text(str(row)+","+str(col),cell.width/2,cell.height/2);
         popMatrix();
         popStyle();
       }
