@@ -1,7 +1,8 @@
-iTestScene s=new gridTest1();
+iTestScene s=new gridTest2();
 void setup()
 {
-  size(500,500);
+  size(1024,800);
+  frameRate(60);
   s.setup();
 }
 

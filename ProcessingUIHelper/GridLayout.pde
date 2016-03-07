@@ -10,7 +10,8 @@ public class GridLayout
   boolean enableBackground;
   color[] background;
   int previousWidth,previousHeight;
-  
+  PVector projectScale=new PVector(1,1,1);
+
   public GridLayout(GridLayout p, int row,int col, int rowSpan, int colSpan)
   { 
     topLeft=p.cells[row][col].topLeft;
@@ -53,36 +54,7 @@ public class GridLayout
     setRows("1*");
   }
   
-  public void boundToCells(int row,int col, int rowSpan,int colSpan)
-  {
-    previousWidth=width;
-    previousHeight=height;
-    PVector pos1=cells[row][col].topLeft;
-    PVector pos2=cells[row+rowSpan][col+colSpan].bottomRight;
-    println("pos1",pos1,"pos2",pos2);
-    println("width",pos2.x-pos1.x);
-    pushMatrix();
-    cells[row][col].translateTo();
-    width=int(pos2.x-pos1.x);
-    height=int(pos2.y-pos1.y);
-  }
-  public void projectToCells(int row,int col, int rowSpan,int colSpan,int w,int h)
-  {
-    previousWidth=width;
-    previousHeight=height;
-    PVector pos1=cells[row][col].topLeft;
-    PVector pos2=cells[row+rowSpan][col+colSpan].bottomRight;
-    println("pos1",pos1,"pos2",pos2);
-    println("width",pos2.x-pos1.x);
-    pushMatrix();
-    
-    cells[row][col].translateTo();
-    
-    width=w;
-    height=h;
-    scale(float(width)/w,float(height)/h);
-  }
-  
+ 
   public void project()
   {
     previousWidth=width;
@@ -96,6 +68,7 @@ public class GridLayout
     
     width=int(pos2.x-pos1.x);
     height=int(pos2.y-pos1.y);
+    projectScale.set(1,1,1);
   }
   
     public void project(float w,float h)
@@ -111,8 +84,9 @@ public class GridLayout
     
     width=int(w);
     height=int(h);
-    println((pos2.x-pos1.x)/w,(pos2.y-pos1.y)/h);
-    scale((pos2.x-pos1.x)/w,(pos2.y-pos1.y)/h);
+    //println((pos2.x-pos1.x)/w,(pos2.y-pos1.y)/h);
+    projectScale.set((pos2.x-pos1.x)/w,(pos2.y-pos1.y)/h);
+    scale(projectScale.x,projectScale.y);
   }
   public void unProject()
   {
@@ -121,12 +95,7 @@ public class GridLayout
     popMatrix();    
   }
   
-  public void unbound()
-  {
-    width=previousWidth;
-    height=previousHeight;
-    popMatrix();
-  }
+
   
   public void setColumns(String data)
   {
@@ -154,7 +123,40 @@ public class GridLayout
     }
   }
   
+  public void drawChessboard()
+  {
+    drawChessboard(true);
+  }
+  
   public void drawChessboard(color... colors)
+  {
+    drawChessboard(true,colors);
+  }
+  
+  public PVector getMouseXY()
+  {
+    return getMouseXY(false);
+  }
+  
+  public PVector getMouseXY(boolean checkInbound)
+  {
+    PVector result=new PVector(mouseX,mouseY);
+    if(checkInbound && !(result.x>=topLeft.x && result.x<=topLeft.x+gridWidth && result.y>=topLeft.y && result.y<=topLeft.y+gridHeight))
+    {
+      return null;
+    }
+    else
+    {
+      
+      result=result.sub(topLeft);
+      result.set(result.x/projectScale.x,result.y/projectScale.y);
+      return result;
+    }
+    
+
+  }
+  
+  public void drawChessboard(boolean showPosition,color... colors)
   {
     if (colors.length==0)
     {
@@ -172,15 +174,18 @@ public class GridLayout
         GridCell cell=cells[row][col];
         cell.translateTo();
         rect(0,0,cell.width,cell.height);
-        //revert the color for text
-        int r = (c >> 16) & 0xFF;  // Faster way of getting red(argb)
-        int g = (c >> 8) & 0xFF;   // Faster way of getting green(argb)
-        int b = c & 0xFF;          // Faster way of getting blue(argb)
-        c=color(255-r,255-g,255-b);
-        fill(c);
-        println(c & 0x00ff0000);
-        textAlign(CENTER,CENTER);
-        text(str(row)+","+str(col),cell.width/2,cell.height/2);
+        if(showPosition)
+        {
+          //revert the color for text
+          int r = (c >> 16) & 0xFF;  // Faster way of getting red(argb)
+          int g = (c >> 8) & 0xFF;   // Faster way of getting green(argb)
+          int b = c & 0xFF;          // Faster way of getting blue(argb)
+          c=color(255-r,255-g,255-b);
+          fill(c);
+          println(c & 0x00ff0000);
+          textAlign(CENTER,CENTER);
+          text(str(row)+","+str(col),cell.width/2,cell.height/2);
+        }
         popMatrix();
         popStyle();
       }
@@ -201,7 +206,6 @@ public class GridLayout
       if (item.endsWith("*"))// a star position
       {
         item=item.substring(0,item.length()-1).trim();
-        
         dynamicTotal+=float(item);
       }
       else
