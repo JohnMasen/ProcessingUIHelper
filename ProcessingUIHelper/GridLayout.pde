@@ -49,8 +49,8 @@ public class GridLayout
   
   private void setDefaultGrid()
   {
-    setColumns("1*,1*,1*,1*,1*,1*,1*,1*,1*,1*,1*,1*");
-    setRows("1*,1*,1*,1*,1*,1*,1*,1*,1*,1*,1*,1*");
+    setColumns("1*");
+    setRows("1*");
   }
   
   public void boundToCells(int row,int col, int rowSpan,int colSpan)
@@ -78,9 +78,47 @@ public class GridLayout
     
     cells[row][col].translateTo();
     
+    width=w;
+    height=h;
+    scale(float(width)/w,float(height)/h);
+  }
+  
+  public void project()
+  {
+    previousWidth=width;
+    previousHeight=height;
+    PVector pos1=cells[0][0].topLeft;
+    println(rows.length-1,columns.length-1);
+    PVector pos2=cells[rows.length-2][columns.length-2].bottomRight; 
+    pushMatrix();
+    
+    cells[0][0].translateTo();
+    
     width=int(pos2.x-pos1.x);
     height=int(pos2.y-pos1.y);
-    scale(float(width)/w,float(height)/h);
+  }
+  
+    public void project(float w,float h)
+  {
+    previousWidth=width;
+    previousHeight=height;
+    PVector pos1=cells[0][0].topLeft;
+    PVector pos2=cells[rows.length-2][columns.length-2].bottomRight;
+    pushMatrix();
+    
+    cells[0][0].translateTo();
+    //cells[0][0].translateTo(((pos2.x-pos1.x)/w),((pos2.y-pos1.y)/h));
+    
+    width=int(w);
+    height=int(h);
+    println((pos2.x-pos1.x)/w,(pos2.y-pos1.y)/h);
+    scale((pos2.x-pos1.x)/w,(pos2.y-pos1.y)/h);
+  }
+  public void unProject()
+  {
+    width=previousWidth;
+    height=previousHeight;
+    popMatrix();    
   }
   
   public void unbound()
@@ -210,6 +248,11 @@ public class GridCell
   {
     translate(world.x,world.y);
     translate(topLeft.x,topLeft.y);
+  }
+  public void translateTo(float scaleX, float scaleY)
+  {
+    translate(world.x*scaleX,world.y*scaleY);
+    translate(topLeft.x*scaleX,topLeft.y*scaleY);
   }
   
   public void draw()

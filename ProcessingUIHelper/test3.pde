@@ -9,22 +9,34 @@ public class test3 implements iTestScene
   float dx;  // Value for incrementing X, a function of period and xspacing
   float[] yvalues;  // Using an array to store height values for the wave
   GridLayout g;
+  GridLayout workspace;
   void setup()
   {
-    g=new GridLayout();
+    g=new GridLayout();//root grid
+    g.setColumns("10*,2*");
+    g.setRows("1*");
+    workspace=new GridLayout(g,0,1,0,0);
+    workspace.setColumns("1*,1*");
+    workspace.setRows("1*,1*");
+
     w = width+16;
+    w=640+16;
     dx = (TWO_PI / period) * xspacing;
     yvalues = new float[w/xspacing];
+
   }
   
   void draw()
   {
     background(51);
-    g.drawChessboard(color(100),color(200));
-    g.projectToCells(1,1,6,7,600,360);
+    g.drawChessboard();
+    workspace.drawChessboard(color(100),color(200));
+    workspace.project(640,360);
+
     calcWave();
     renderWave();
-    g.unbound();
+
+    workspace.unProject();
   }
   void calcWave() {
     // Increment theta (try different values for 'angular velocity' here
